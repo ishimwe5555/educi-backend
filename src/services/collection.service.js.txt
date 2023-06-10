@@ -1,4 +1,4 @@
-import Collection from '../database/models/collection.model';
+// import Collection from '../database/models/collection.model';
 import Images from '../database/models/images.model';
 import Products from '../database/models/products.model';
 

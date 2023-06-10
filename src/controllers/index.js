@@ -7,8 +7,9 @@ import tfaEnableDisable from './enableDisable';
 import reviewControllers from './review.controller';
 import cartControllers from './cart.controller';
 import readNotificationController from './read_notification.controller';
-import orderControllers from './order.controller';
+// import orderControllers from './order.controller';
 import productImageController from './productImage.controller';
+import categoryController from './categories.controller';
 
 import {
   userProfileController,
@@ -27,6 +28,6 @@ export {
   userProfileController,
   fetchUserController,
   readNotificationController,
-  orderControllers,
   productImageController,
+  categoryController,
 };

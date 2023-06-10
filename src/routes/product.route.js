@@ -4,15 +4,15 @@ import { asyncWrapper } from '../helpers';
 import {
   checkPermission,
   isAuthenticated,
-  isCollectionExists,
+  // isCollectionExists,
   isProductSeller,
-  isValidCollection,
+  // isValidCollection,
   validate,
   validateParams,
   checkImg,
 } from '../middleware';
 import { productControllers, productImageController } from '../controllers';
-import { CollectionNameSchema, productSchema, uuidSchemas } from '../utils';
+import { productSchema, uuidSchemas } from '../utils';
 import Upload from '../helpers/multer';
 
 const router = Router();
@@ -28,7 +28,7 @@ router.get(
   validateParams(uuidSchemas.collectionIdSchema),
   isAuthenticated,
   checkPermission('SELLER'),
-  isValidCollection,
+  // isValidCollection,
   asyncWrapper(productControllers.listItems)
 );
 
@@ -43,36 +43,38 @@ router.delete(
   isAuthenticated,
   checkPermission('SELLER'),
   validateParams(uuidSchemas.deleteProductSchema),
-  isValidCollection,
+  // isValidCollection,
   asyncWrapper(productControllers.deleteProduct)
 );
 
-router.post(
-  '/create-collection',
-  isAuthenticated,
-  checkPermission('SELLER'),
-  validate(CollectionNameSchema),
-  isCollectionExists,
-  asyncWrapper(productControllers.CreateCollection)
-);
+// router.post(
+//   '/create-collection',
+//   isAuthenticated,
+//   checkPermission('SELLER'),
+//   validate(CollectionNameSchema),
+//   isCollectionExists,
+//   asyncWrapper(productControllers.CreateCollection)
+// );
 
 router.delete(
   '/:cid/delete',
   isAuthenticated,
   checkPermission('SELLER'),
-  isValidCollection,
+  // isValidCollection,
   asyncWrapper(productControllers.DeleteCollection)
 );
 
-router.post(
-  '/collection/:cid',
-  Upload,
-  validate(productSchema.addproductSchema),
-  isAuthenticated,
-  checkPermission('SELLER'),
-  isValidCollection,
-  asyncWrapper(productControllers.addproduct)
-);
+// router.post(
+//   '/',
+//   Upload,
+//   validate(productSchema.addproductSchema),
+//   isAuthenticated,
+//   checkPermission('SELLER'),
+//   isValidCollection,
+//   asyncWrapper(productControllers.addproduct)
+// );
+
+router.post('/', Upload, asyncWrapper(productControllers.addproduct));
 
 router.patch(
   '/update/:id',

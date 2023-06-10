@@ -1,5 +1,5 @@
 import Order from '../database/models/order.model';
-import ShippingAddress from '../database/models/shippingAddress.model';
+// import ShippingAddress from '../database/models/shippingAddress.model';
 import Product from '../database/models/products.model';
 
 async function createOrder(orderDetails) {

@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-inner-declarations */
 /* eslint-disable radix */
-import { collectionServices, productsServices } from '../services';
+import { productsServices } from '../services';
 
 const response = (res, cd, msg, dt) =>
   res.status(cd).json({
@@ -10,39 +10,15 @@ const response = (res, cd, msg, dt) =>
     data: dt,
   });
 
-const CreateCollection = async (req, res) => {
-  const collectionName = req.body.name;
-  const userId = req.user.id;
-  const collectionObj = {
-    userId,
-    name: collectionName,
-  };
-  const collection = await collectionServices.createCollection(collectionObj);
-
-  return res.status(201).json({
-    code: 201,
-    message: 'Collection Created.',
-    collection,
-  });
-};
-
-const DeleteCollection = async (req, res) => {
-  await collectionServices.deleteCollection(req.params.cid);
-  return res.status(200).json({ code: 200, message: 'Collection Deleted' });
-};
-
 const getSingleProduct = async (req, res) => {
   const { pid } = req.params;
-  const product = await collectionServices.getProduct(pid);
+  const product = await productsServices.getProduct(pid);
   return response(res, 200, 'Product Fetched.', product);
 };
 
 const deleteProduct = async (req, res) => {
-  const { cid, pid } = req.params;
-  const deletedProduct = await collectionServices.deleteFromCollection(
-    cid,
-    pid
-  );
+  const { pid } = req.params;
+  const deletedProduct = await productsServices.deleteProduct(pid);
   if (deletedProduct) {
     return res.status(200).json({ code: 200, message: 'Product Deleted.' });
   }
@@ -50,58 +26,97 @@ const deleteProduct = async (req, res) => {
 };
 
 const addproduct = async (req, res) => {
-  const { cid } = req.params;
-  const { productName, productPrice, category, expDate, bonus, quantity } =
-    req.body;
+  const {
+    name,
+    vendorId,
+    subsubcategoryId,
+    brand,
+    price,
+    pricing,
+    description,
+    shortDescription,
+    productType,
+  } = req.body;
+
   const img = req.files;
+
   let url = [];
-  if (img.length < 4 || img.length > 8) {
+  if (img.length < 1) {
     res.status(400).json({
       code: '400',
       message: 'Failed',
-      error: 'selected images must be in Range of 4 to 8',
+      error: 'You must select an image',
     });
   } else {
-    const { product } = await productsServices.getProductByNameAndCollectionId(
-      productName,
-      cid
+    const { product } = await productsServices.getProductByNameSubAndVendorId(
+      name,
+      vendorId,
+      subsubcategoryId
     );
     if (product === null) {
-      const promises = img.map(async (item) => {
-        const { image } = await productsServices.uploadImage(item.path);
+      if (img.length === 1) {
+        const { image } = await productsServices.uploadImage(img[0].path);
         if (image) {
-          return image.url;
+          url = [image.url];
         }
-      });
-      url = await Promise.all(promises);
-      const body = {
-        name: productName,
-        price: productPrice,
-        category,
-        expDate,
-        bonus,
-        quantity,
-        collectionId: cid,
+      } else {
+        const promises = img.map(async (item) => {
+          const { image } = await productsServices.uploadImage(item.path);
+          if (image) {
+            return image.url;
+          }
+        });
+        url = await Promise.all(promises);
+      }
+
+      const productBody = {
+        name,
+        vendorId,
+        subsubcategoryId,
       };
-      const { data } = await productsServices.createProduct(body);
+
+      const { data } = await productsServices.createProduct(productBody);
+
+      const attributesBody = {
+        productId: data.id,
+        price,
+        brand,
+        pricing,
+        description,
+        shortDescription,
+        productType,
+      };
+
+      await productsServices.createAttributes(attributesBody);
+
       if (data != null) {
-        const sendImage = url.map(async (item) => {
-          const imageBody = { url: item, productId: data.id };
-          const { images } = await productsServices.AddImage(imageBody);
-          return images;
-        });
-        await Promise.all(sendImage);
-        res.status(200).json({
-          code: '200',
-          message: 'Successful',
-          product: data,
-        });
+        if (url.length === 1) {
+          const imageBody = { url: url[0], productId: data.id };
+          await productsServices.AddImage(imageBody);
+          res.status(200).json({
+            code: '200',
+            message: 'Product Successfully added',
+            data,
+          });
+        } else {
+          const sendImage = url.map(async (item) => {
+            const imageBody = { url: item, productId: data.id };
+            const { images } = await productsServices.AddImage(imageBody);
+            return images;
+          });
+          await Promise.all(sendImage);
+          res.status(200).json({
+            code: '200',
+            message: 'Product Successfully added',
+            data,
+          });
+        }
       }
     }
     if (product) {
       res
         .status(409)
-        .json({ code: '409', message: 'Existing products', product });
+        .json({ code: '409', message: 'Product already exists', product });
     }
   }
 };
@@ -173,7 +188,7 @@ const listItems = async (req, res) => {
 
 const listAllItems = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 3;
 
   const offset = (page - 1) * limit;
 
@@ -192,9 +207,14 @@ const listAllItems = async (req, res) => {
   });
 };
 
+const getProductByCategory = async (req, res) => {
+  const { subcategoryId } = req.params;
+  const products = await productsServices.getProductsByCategory(subcategoryId);
+
+  return response(res, 200, 'Products Fetched by Category.', products);
+};
+
 export default {
-  CreateCollection,
-  DeleteCollection,
   getSingleProduct,
   deleteProduct,
   addproduct,
@@ -202,4 +222,5 @@ export default {
   searchProducts,
   listItems,
   listAllItems,
+  getProductByCategory,
 };

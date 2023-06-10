@@ -1,7 +1,9 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import Collection from './collection.model.js';
 import Images from './images.model.js';
+import SubSubCategory from './subsubcategories.model.js';
+import Vendors from './vendors.model';
+import ProductAttributes from './productAttributes.model.js';
 
 const Products = sequelize.define('products', {
   id: {
@@ -14,42 +16,47 @@ const Products = sequelize.define('products', {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  price: {
-    type: Sequelize.DOUBLE,
-    allowNull: false,
-  },
-  category: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  expDate: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  bonus: {
-    type: Sequelize.DOUBLE,
-    allowNull: false,
-  },
-  quantity: {
-    type: Sequelize.DOUBLE,
-    defaultValue: 0,
-  },
-  collectionId: {
-    type: Sequelize.UUID,
+  vendorId: {
+    type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'collections',
+      model: Vendors,
       key: 'id',
     },
     onDelete: 'CASCADE',
   },
-  expiredflag: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+  subsubcategoryId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: SubSubCategory,
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
   },
 });
 
-Products.belongsTo(Collection, { onDelete: 'cascade' });
+Products.belongsTo(SubSubCategory, {
+  as: 'productItem',
+  foreignKey: 'subsubcategoryId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
 Products.hasMany(Images, { as: 'productImages', onDelete: 'cascade' });
+
+Products.belongsTo(Vendors, {
+  as: 'productsVendor',
+  foreignKey: 'vendorId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+Products.hasOne(ProductAttributes, {
+  foreignKey: 'productId',
+  as: 'productAttributes',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 export default Products;

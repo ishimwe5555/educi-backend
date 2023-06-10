@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('products', {
+    await queryInterface.createTable('brands', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -12,14 +12,6 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      subsubcategoryId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
-      vendorId: {
-        type: DataTypes.UUID,
         allowNull: false,
       },
       createdAt: {
@@ -33,6 +25,6 @@ module.exports = {
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('products');
+    await queryInterface.dropTable('brands');
   },
 };

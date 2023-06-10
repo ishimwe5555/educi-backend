@@ -12,13 +12,8 @@ import {
   decodeResetPasswordToken,
   decodeToken,
   hashPassword,
-  notificationUtils,
 } from '../utils';
-import {
-  userServices,
-  notificationServices,
-  userProfileServices,
-} from '../services';
+import { userServices, userProfileServices } from '../services';
 
 import twoFactorAuth from '../services/twofactor.service';
 import verifyOldPassword from '../helpers/verifyPassword';
@@ -51,15 +46,6 @@ const signUp = async (req, res, next) => {
       await userProfileServices.createUserProfiles(dataprofiles);
       const token = generateToken(body);
       redisClient.setEx(req.user.id, 86400, token);
-
-      await notificationUtils.signup(req.user);
-      notificationServices.sendNotification(
-        req.user.id,
-        'Account is created successfully',
-        'User registration',
-        'low'
-      );
-
       res
         .status(201)
         .header('authenticate', token)
@@ -261,14 +247,6 @@ const changePassword = async (req, res, next) => {
 
     // Save the updated user object
     await user.save();
-
-    await notificationUtils.changePassword(req.user);
-    notificationServices.sendNotification(
-      req.user.id,
-      'Password is changed successfully',
-      'Password update',
-      'low'
-    );
 
     return res.status(200).json({
       code: 200,

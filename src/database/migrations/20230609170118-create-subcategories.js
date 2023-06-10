@@ -2,25 +2,28 @@
 import { DataTypes } from 'sequelize';
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('products', {
+  up: async (queryInterface, Sequelize) => {
+    // Create the subcategories table
+    queryInterface.createTable('subcategories', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
         primaryKey: true,
+        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      subsubcategoryId: {
+      categoryId: {
         type: DataTypes.UUID,
         allowNull: false,
-      },
-      vendorId: {
-        type: DataTypes.UUID,
-        allowNull: false,
+        foreignKey: {
+          references: {
+            table: 'categories',
+            column: 'id',
+          },
+        },
       },
       createdAt: {
         allowNull: false,
@@ -32,7 +35,9 @@ module.exports = {
       },
     });
   },
-  async down(queryInterface) {
-    await queryInterface.dropTable('products');
+
+  down: async (queryInterface) => {
+    // Drop the subcategories table
+    queryInterface.dropTable('subcategories');
   },
 };

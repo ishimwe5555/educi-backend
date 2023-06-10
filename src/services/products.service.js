@@ -3,10 +3,16 @@ import { extractPublicId } from 'cloudinary-build-url';
 import Products from '../database/models/products.model';
 import Images from '../database/models/images.model';
 import Cloudinary from '../helpers/cloudinary';
+import ProductAttributes from '../database/models/productAttributes.model';
 // import Collection from '../database/models/collection.model';
 
-async function createProduct(body) {
-  const data = await Products.create(body);
+async function createProduct(body, options) {
+  const data = await Products.create(body, options);
+  return { data, err: null };
+}
+
+async function createAttributes(body, options) {
+  const data = await ProductAttributes.create(body, options);
   return { data, err: null };
 }
 
@@ -33,24 +39,65 @@ async function AddImage(body) {
   const data = await Images.create(body);
   return { data };
 }
-async function getProductByNameAndCollectionId(name, cid) {
+async function getProductByNameSubAndVendorId(name, vid, subId) {
   const product = await Products.findOne({
-    where: { name, collectionId: cid },
+    where: { name, vendorId: vid, subsubcategoryId: subId },
   });
   return { product };
 }
-
 async function getProductById(id) {
-  const product = await Products.findOne({ where: { id } });
+  const product = await Products.findOne({
+    where: { id },
+    include: {
+      model: Images,
+      as: 'productImages',
+    },
+  });
   return product;
+}
+
+async function getProductsByVendor(id) {
+  const products = await Products.findAll({
+    where: { vendorId: id },
+    include: {
+      model: Images,
+      as: 'productImages',
+    },
+  });
+  return products;
+}
+
+async function getProductsBySubsubcategory(id) {
+  const products = await Products.findAll({
+    where: { subcategoryId: id },
+    include: {
+      model: Images,
+      as: 'productImages',
+    },
+  });
+  return products;
+}
+
+async function getProduct(pid) {
+  const products = await Products.findOne({
+    where: { id: pid },
+    include: {
+      model: Images,
+      as: 'productImages',
+    },
+  });
+  if (!products) {
+    return [];
+  }
+  return products;
 }
 
 async function findAllProducts({ offset, limit }) {
   const products = await Products.findAll({
-    where: {
-      expiredflag: false,
-    },
-    include: [{ model: Images, as: 'productImages', attributes: ['url'] }],
+    include: [
+      { model: Images, as: 'productImages', attributes: ['url'] },
+      { model: ProductAttributes, as: 'productAttributes' },
+    ],
     offset,
     limit,
   });
@@ -58,8 +105,8 @@ async function findAllProducts({ offset, limit }) {
 }
 
 async function getTotalProductsCount() {
-  const produc = await Products.findAll();
-  return produc.length;
+  const products = await Products.findAll();
+  return products.length;
 }
 
 async function searchproduct(query) {
@@ -100,21 +147,28 @@ async function expiredProductDate() {
   });
   return foundProduct;
 }
-async function updateProductStatus(Product) {
-  const status = await Promise.all(
-    Product.map(async (product) => {
-      product.expiredflag = true;
-      await product.save();
-    })
-  );
-  return status;
+// async function updateProductStatus(Product) {
+//   const status = await Promise.all(
+//     Product.map(async (product) => {
+//       product.expiredflag = true;
+//       await product.save();
+//     })
+//   );
+//   return status;
+// }
+
+async function deleteProduct(productId) {
+  const deletedProduct = await Products.destroy({
+    where: { id: productId },
+  });
+  return deletedProduct;
 }
 
 export default {
   createProduct,
   addUpdate,
   uploadImage,
-  getProductByNameAndCollectionId,
+  getProductByNameSubAndVendorId,
   getProductById,
   deleteImage,
   AddImage,
@@ -122,6 +176,10 @@ export default {
   findAllProducts,
   getTotalProductsCount,
   expiredProductDate,
-  updateProductStatus,
   removeUrlFromImages,
+  getProduct,
+  deleteProduct,
+  getProductsByVendor,
+  getProductsBySubsubcategory,
+  createAttributes,
 };

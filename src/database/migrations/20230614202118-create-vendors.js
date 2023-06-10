@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('products', {
+    await queryInterface.createTable('vendors', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -14,13 +14,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      subsubcategoryId: {
-        type: DataTypes.UUID,
-        allowNull: false,
+      email: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
-      vendorId: {
-        type: DataTypes.UUID,
-        allowNull: false,
+      country: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
@@ -33,6 +33,6 @@ module.exports = {
     });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('products');
+    await queryInterface.dropTable('vendors');
   },
 };

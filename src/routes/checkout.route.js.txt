@@ -3,10 +3,10 @@ import {
   checkPermission,
   isAuthenticated,
   checkProductInStock,
-  checkShippingAddressExist,
+  // checkShippingAddressExist,
   validate,
 } from '../middleware';
-import { shippingAddressSchema } from '../utils';
+// import { shippingAddressSchema } from '../utils';
 import { checkoutControllers } from '../controllers';
 import { asyncWrapper } from '../helpers';
 
