@@ -1,6 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import Collection from './collection.model.js';
 import Images from './images.model.js';
 
 const Products = sequelize.define('products', {
@@ -18,9 +17,14 @@ const Products = sequelize.define('products', {
     type: Sequelize.DOUBLE,
     allowNull: false,
   },
-  category: {
-    type: Sequelize.STRING,
+  subsubcategoryId: {
+    type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'subsubcategory',
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
   },
   expDate: {
     type: Sequelize.STRING,
@@ -34,22 +38,18 @@ const Products = sequelize.define('products', {
     type: Sequelize.DOUBLE,
     defaultValue: 0,
   },
-  collectionId: {
-    type: Sequelize.UUID,
-    allowNull: false,
-    references: {
-      model: 'collections',
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-  },
   expiredflag: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   },
 });
 
-Products.belongsTo(Collection, { onDelete: 'cascade' });
+Products.belongsTo(SubSubCategory, {
+  as: 'product',
+  foreignKey: 'subsubcategoryId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 Products.hasMany(Images, { as: 'productImages', onDelete: 'cascade' });
 
 export default Products;
