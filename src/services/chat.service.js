@@ -1,4 +1,4 @@
-import Chat from '../database/models/chats.model';
+import Chat from '../database/models/categories.model';
 
 async function createChat(room) {
   const newRoom = await Chat.create({ room });

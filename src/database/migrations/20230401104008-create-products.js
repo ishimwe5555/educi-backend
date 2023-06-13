@@ -18,17 +18,17 @@ module.exports = {
         type: Sequelize.DOUBLE,
         allowNull: false,
       },
-      category: {
-        type: Sequelize.STRING,
+      subsubcategoryId: {
+        type: DataTypes.UUID,
         allowNull: false,
       },
       expDate: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       bonus: {
         type: Sequelize.DOUBLE,
-        allowNull: false,
+        allowNull: true,
       },
       quantity: {
         type: Sequelize.DOUBLE,

@@ -192,6 +192,13 @@ const listAllItems = async (req, res) => {
   });
 };
 
+const getProductByCategory = async (req, res) => {
+  const { subcategoryId } = req.params;
+  const products = await productsServices.getProductsByCategory(subcategoryId);
+
+  return response(res, 200, 'Products Fetched by Category.', products);
+};
+
 export default {
   CreateCollection,
   DeleteCollection,
@@ -202,4 +209,5 @@ export default {
   searchProducts,
   listItems,
   listAllItems,
+  getProductByCategory,
 };
