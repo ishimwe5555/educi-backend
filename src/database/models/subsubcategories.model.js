@@ -1,21 +1,22 @@
 import { Sequelize, DataTypes } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../config/db.js';
 import SubCategory from './subcategories.model.js';
-import Products from './products.model.js';
 
 const SubSubCategory = sequelize.define('subsubcategories', {
   id: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    defaultValue: uuidv4(),
     allowNull: false,
     primaryKey: true,
   },
   name: {
     type: Sequelize.STRING,
     allowNull: false,
+    unique: true,
   },
   subcategoryId: {
-    type: Sequelize.INTEGER,
+    type: DataTypes.UUID,
     allowNull: false,
     foreignKey: {
       references: {
@@ -24,13 +25,6 @@ const SubSubCategory = sequelize.define('subsubcategories', {
       },
     },
   },
-});
-
-SubSubCategory.hasMany(Products, {
-  as: 'product',
-  foreignKey: 'subCategoryId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
 });
 
 SubSubCategory.belongsTo(SubCategory, {

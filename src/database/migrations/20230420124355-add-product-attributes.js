@@ -52,7 +52,7 @@ module.exports = {
 
     // Add the language column
     await queryInterface.addColumn('products', 'language', {
-      type: DataTypes.ENUM('ENGLISH', 'GERMAN'),
+      type: DataTypes.STRING,
       allowNull: true,
     });
 

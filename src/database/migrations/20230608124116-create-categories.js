@@ -1,11 +1,15 @@
+/** @type {import('sequelize-cli').Migration} */
+import { DataTypes } from 'sequelize';
+
 module.exports = {
-  up(queryInterface, Sequelize) {
+  up: async (queryInterface, Sequelize) => {
     // Create the categories table
-    queryInterface.createTable('categories', {
+    await queryInterface.createTable('categories', {
       id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
+        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
@@ -14,8 +18,8 @@ module.exports = {
     });
   },
 
-  down(queryInterface) {
+  down: async (queryInterface) => {
     // Drop the categories table
-    queryInterface.dropTable('categories');
+    await queryInterface.dropTable('categories');
   },
 };
